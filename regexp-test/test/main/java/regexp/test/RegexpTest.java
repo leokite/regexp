@@ -1,7 +1,10 @@
 package regexp.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -142,19 +145,35 @@ public class RegexpTest {
         assertTrue("abbb".matches("ab{2,3}"));
         assertFalse("abbbb".matches("ab{2,3}"));
     }
-
+    
+    @Test
+    public void 論理和_いずれかのパターンにマッチする() {
+        assertTrue("a".matches("a|b"));
+        assertTrue("b".matches("a|b"));
+        assertFalse("c".matches("a|b"));
+    }
+    
+   @Test
+   public void グループ化_パターンをグループ化してマッチする() {
+       assertTrue("def".matches("(abc)*(def)+"));
+       assertTrue("abcdef".matches("(abc)*(def)+"));
+       assertTrue("abcdefdef".matches("(abc)*(def)+"));
+   }
+    
     @Test
     public void 境界_行頭にマッチ() {
-        assertTrue("a".matches("^a"));
-        assertFalse("ab".matches("^a"));
-        // assertTrue("abc".matches("(^a).*"));
+        Pattern pattern = Pattern.compile("^a");
+        Matcher matcher = pattern.matcher("ab");
+        assertTrue(matcher.find());
     }
     
     @Test
     public void 境界_行末にマッチ() {
+        Pattern pattern = Pattern.compile("b$");
+        Matcher matcher = pattern.matcher("ab");
+        assertTrue(matcher.find());
         assertTrue("a".matches("a$"));
         assertFalse("ba".matches("a$"));
-        // assertTrue("ba".matches(".*(a$)"));
     }
     
     @Test
@@ -176,22 +195,40 @@ public class RegexpTest {
         matcher = pattern.matcher("Howareyou?");
         assertTrue(matcher.find());
     }
+    
     @Test
-    public void 論理和_いずれかのパターンにマッチする() {
-        assertTrue("a".matches("a|b"));
-        assertTrue("b".matches("a|b"));
-        assertFalse("c".matches("a|b"));
+    public void 肯定的先読み() {
+        Pattern pattern = Pattern.compile("(?=fuga)"); // fugaの直前の位置を取得
+        Matcher matcher = pattern.matcher("hogefuga");
+        if (matcher.find()) {
+            assertEquals("hoge".length(), matcher.start());
+        } else {
+            fail();
+        }
+        
+        pattern = Pattern.compile(".*(?=fuga)"); // fugaの手間の文字列をすべて取得
+        matcher = pattern.matcher("hogefuga");
+        if (matcher.find()) {
+            assertTrue("hoge".equals(matcher.group()));
+        } else {
+            fail();
+        }
     }
     
-   @Test
-   public void グループ化_パターンをグループ化してマッチする() {
-       assertTrue("def".matches("(abc)*(def)+"));
-       assertTrue("abcdef".matches("(abc)*(def)+"));
-       assertTrue("abcdefdef".matches("(abc)*(def)+"));
-   }
-    
-    
-    
+    @Test
+    public void 否定的先読み() {
+        Pattern pattern = Pattern.compile("(?!fuga)"); // fugaの直前の位置以外を取得
+        Matcher matcher = pattern.matcher("hfuga");
+        while (matcher.find()) {
+            assertNotEquals(1, matcher.start());
+        }
+        
+        pattern = Pattern.compile(".(?!fuga)"); // 直後にfugaが現れない1文字を取得
+        matcher = pattern.matcher("hfuga");
+        while (matcher.find()) {
+            assertNotEquals("h", matcher.group());
+        }
+    }
     
     
     

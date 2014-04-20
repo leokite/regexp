@@ -15,6 +15,7 @@ import org.junit.Test;
  * 正規表現の動作テスト
  */
 public class RegexpTest {
+
     /**
      * 文字："."
      * 意味：改行以外の任意の一文字にマッチ

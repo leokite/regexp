@@ -270,7 +270,7 @@ public class RegexpTest {
      * 意味：単語の境界にマッチする
      */
     @Test
-    public void 境界_単語の境界にマッチ() {
+    public void 単語の境界にマッチ() {
         Pattern pattern = Pattern.compile("\\bARE");
         Matcher matcher = pattern.matcher("HOW ARE YOU?");
         assertTrue(matcher.find());
@@ -284,7 +284,7 @@ public class RegexpTest {
      * 意味：単語の境界以外にマッチする
      */
     @Test
-    public void 境界_単語の境界以外にマッチ() {
+    public void 単語の境界以外にマッチ() {
         Pattern pattern = Pattern.compile("\\Bare");
         Matcher matcher = pattern.matcher("How are you?");
         assertFalse(matcher.find());
